@@ -159,7 +159,7 @@ public class Facade extends Observable {
     // =====================================================
 
     public boolean canInsertTile(Direction direction, int index) {
-        if (game == null || game.getState() != Game.GameState.RUNNING) {
+        if (game == null || game.getState() != GameState.PLAYING) {
             return false;
         }
         if (game.isTileInsertedThisTurn()) {
@@ -199,7 +199,7 @@ public class Facade extends Observable {
     }
 
     public Set<Position> getReachablePositions() {
-        if (game == null || game.getState() != Game.GameState.RUNNING) {
+        if (game == null || game.getState() != GameState.PLAYING) {
             return Collections.emptySet();
         }
         if (!game.isTileInsertedThisTurn()) {
@@ -209,7 +209,7 @@ public class Facade extends Observable {
     }
 
     public boolean canMoveTo(Position destination) {
-        if (game == null || game.getState() != Game.GameState.RUNNING) {
+        if (game == null || game.getState() != GameState.PLAYING) {
             return false;
         }
         if (!game.isTileInsertedThisTurn()) {
@@ -219,9 +219,16 @@ public class Facade extends Observable {
     }
 
     public void movePlayer(Position destination) {
-        if (!canMoveTo(destination)) {
-            throw new IllegalStateException("Cannot move to " + destination);
+        if (game == null || game.getState() != GameState.PLAYING) {
+            throw new IllegalStateException("Cannot move without an active game");
         }
+        if (!game.isTileInsertedThisTurn()) {
+            throw new IllegalStateException("Must insert a tile before moving");
+        }
+        if (!game.canMoveTo(destination)) {
+            throw new IllegalArgumentException("Destination is not reachable: " + destination);
+        }
+
         game.movePlayer(destination);
     }
 
@@ -264,6 +271,15 @@ public class Facade extends Observable {
         return game.getWinner();
     }
 
+    /**
+     * Exposes the current game state to callers (primarily tests and views).
+     *
+     * @return the current {@link GameState}, or {@link GameState#NOT_STARTED} if no game exists yet
+     */
+    public GameState getGameState() {
+        return game == null ? GameState.NOT_STARTED : game.getState();
+    }
+
     public void abandonGame() {
         if (game != null) {
             game.abandon();
@@ -287,6 +303,13 @@ public class Facade extends Observable {
     }
     public void startGame(int numberOfPlayers, int numberOfHumans) {
         this.game = new Game(numberOfPlayers, numberOfHumans);
+
+        game.addObserver((o, arg) -> {
+            setChanged();
+            notifyObservers(arg);
+        });
+
+        initializeBoard();
         game.start();
     }
 }

@@ -10,8 +10,6 @@ import java.util.*;
  * @author g64974
  */
 public class Game extends Observable {
-
-    public static g64974.dev3.labyrinthe.model.GameState GameState;
     private final Board board;
     private final List<Player> players;
     private int currentPlayerIndex;
@@ -99,7 +97,7 @@ public class Game extends Observable {
             throw new IllegalStateException("Game already started");
         }
 
-        state = GameState.RUNNING;
+        state = GameState.PLAYING;
         currentPlayerIndex = 0;
         tileInsertedThisTurn = false;
         notifyViews();
@@ -123,7 +121,7 @@ public class Game extends Observable {
      * @return the current player
      */
     public Player getCurrentPlayer() {
-        if (state != GameState.RUNNING) {
+        if (state != GameState.PLAYING) {
             throw new IllegalStateException("Game is not running");
         }
         return players.get(currentPlayerIndex);
@@ -150,7 +148,7 @@ public class Game extends Observable {
      * @param index the row/column index (1, 3, or 5)
      */
     public void insertTile(Direction direction, int index) {
-        if (state != GameState.RUNNING) {
+        if (state != GameState.PLAYING) {
             throw new IllegalStateException("Game is not running");
         }
         if (tileInsertedThisTurn) {
@@ -178,7 +176,7 @@ public class Game extends Observable {
      * @param destination where to move
      */
     public void movePlayer(Position destination) {
-        if (state != GameState.RUNNING) {
+        if (state != GameState.PLAYING) {
             throw new IllegalStateException("Game is not running");
         }
         if (!tileInsertedThisTurn) {
@@ -233,7 +231,7 @@ public class Game extends Observable {
      * @return set of reachable positions
      */
     public Set<Position> getReachablePositions() {
-        if (state != GameState.RUNNING) {
+        if (state != GameState.PLAYING) {
             throw new IllegalStateException("Game is not running");
         }
 
@@ -248,7 +246,7 @@ public class Game extends Observable {
      * @return true if move is possible
      */
     public boolean canMoveTo(Position destination) {
-        if (state != GameState.RUNNING) {
+        if (state != GameState.PLAYING) {
             return false;
         }
 
@@ -289,7 +287,7 @@ public class Game extends Observable {
      * Sets state to FINISHED without a winner.
      */
     public void abandon() {
-        if (state == GameState.RUNNING) {
+        if (state == GameState.PLAYING) {
             state = GameState.FINISHED;
             notifyViews();
         }
@@ -338,7 +336,7 @@ public class Game extends Observable {
         StringBuilder info = new StringBuilder();
         info.append("Game State: ").append(state).append("\n");
 
-        if (state == GameState.RUNNING) {
+        if (state == GameState.PLAYING) {
             info.append("Current Player: ").append(getCurrentPlayer().getName()).append("\n");
             info.append("Tile Inserted: ").append(tileInsertedThisTurn).append("\n");
         }

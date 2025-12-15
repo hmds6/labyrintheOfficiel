@@ -14,7 +14,7 @@ public enum GameState {
     /**
      * Game is in progress.
      */
-    RUNNING,
+    PLAYING,
 
     /**
      * Game is finished (won or abandoned).
