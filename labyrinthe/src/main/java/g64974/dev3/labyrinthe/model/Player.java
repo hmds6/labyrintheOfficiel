@@ -96,6 +96,19 @@ public class Player {
     }
 
     /**
+     * Gets the index of the current objective card.
+     *
+     * <p>This is an alias for {@link #getCurrentObjectiveIndex()} to preserve
+     * compatibility with command logic that saves and restores the current
+     * card for undo/redo.</p>
+     *
+     * @return the current objective index
+     */
+    public int getCurrentCardIndex() {
+        return getCurrentObjectiveIndex();
+    }
+
+    /**
      * Sets the current objective index (for undo).
      *
      * @param index the objective index
@@ -105,6 +118,19 @@ public class Player {
             throw new IllegalArgumentException("Invalid objective index");
         }
         this.currentObjectiveIndex = index;
+    }
+
+    /**
+     * Sets the index of the current objective card.
+     *
+     * <p>This is an alias for {@link #setCurrentObjectiveIndex(int)} to
+     * preserve compatibility with command logic that saves and restores the
+     * current card for undo/redo.</p>
+     *
+     * @param index the objective index to restore
+     */
+    public void setCurrentCardIndex(int index) {
+        setCurrentObjectiveIndex(index);
     }
 
     /**
